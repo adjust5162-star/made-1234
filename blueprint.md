@@ -25,6 +25,7 @@ This project is a web application that uses a pre-trained Teachable Machine mode
     *   **File-based Prediction:** The application predicts from a user-uploaded image file.
     *   **State Management:** Clear state management ensures the 'Predict' button is only active when both the model is loaded and an image is uploaded.
     *   **User Feedback:** The UI provides feedback for loading, prediction, and errors.
+    *   **Event Handling:** Event listeners are managed in JavaScript for better code structure.
 
 ## 3. Implementation Plan
 
@@ -39,15 +40,15 @@ This project is a web application that uses a pre-trained Teachable Machine mode
     *   Create a central function `updatePredictButtonState()` to manage the predict button's state.
     *   Show a loading indicator on the predict button during the prediction process.
     *   Display results in a more structured and readable format.
+    *   Bind event listeners programmatically instead of using inline HTML attributes.
 *   **CSS (`style.css`):**
     *   Implement a modern card-based design with shadows, gradients, and rounded corners.
     *   Style the loading spinner and the button's internal loader.
     *   Ensure the layout is responsive and visually appealing.
 
-## 4. Current Task: Bug Fix and UI Enhancement
+## 4. Current Task: Critical Bug Fix - Prediction Not Triggering
 
-*   **Objective:** Fix the bug where the 'Predict' button was not activating and improve the overall design of the application.
+*   **Objective:** Fix a critical bug where clicking the 'Predict' button did not trigger the prediction function.
 *   **Changes:**
-    *   **`index.html`:** Restructured to include a loading spinner and a card-based layout. Added Font Awesome for icons.
-    *   **`style.css`:** Completely revamped the stylesheet to create a modern, visually appealing interface with better feedback on user interactions.
-    *   **`main.js`:** Introduced state variables to reliably manage the predict button's state. Added logic to show/hide loaders and provide clearer user feedback during asynchronous operations.
+    *   **`main.js`:** Added an event listener to the 'Predict' button to call the `predict()` function on click. Moved the `onchange` event for the file input from the HTML to a programmatic event listener in JavaScript for better code separation and maintenance.
+    *   **`index.html`:** Removed the inline `onchange="handleImage(event)"` attribute from the file input element.

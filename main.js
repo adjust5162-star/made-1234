@@ -5,18 +5,23 @@ let isModelLoaded = false;
 let isImageUploaded = false;
 
 // UI Elements
-let loader, appContainer, imagePreview, imagePlaceholder, labelContainer, predictButton, buttonText, buttonLoader;
+let loader, appContainer, imageUpload, imagePreview, imagePlaceholder, labelContainer, predictButton, buttonText, buttonLoader;
 
 document.addEventListener('DOMContentLoaded', (event) => {
     // Initialize UI Elements
     loader = document.getElementById('loader');
     appContainer = document.getElementById('app-container');
+    imageUpload = document.getElementById('imageUpload');
     imagePreview = document.getElementById('image-preview');
     imagePlaceholder = document.getElementById('image-placeholder');
     labelContainer = document.getElementById('label-container');
     predictButton = document.getElementById('predict-button');
     buttonText = predictButton.querySelector('.button-text');
     buttonLoader = predictButton.querySelector('.button-loader');
+
+    // Add event listeners
+    imageUpload.addEventListener('change', handleImage);
+    predictButton.addEventListener('click', predict);
 
     init();
 });
@@ -29,7 +34,6 @@ async function init() {
         model = await tmImage.load(modelURL, metadataURL);
         isModelLoaded = true;
         
-        // Hide loader and show the main app
         loader.style.display = 'none';
         appContainer.style.display = 'block';
         
@@ -47,7 +51,7 @@ function handleImage(event) {
         reader.onload = function(e) {
             imagePreview.src = e.target.result;
             imagePreview.style.display = 'block';
-            imagePlaceholder.style.display = 'none'; // Hide placeholder
+            imagePlaceholder.style.display = 'none';
             isImageUploaded = true;
             updatePredictButtonState();
         }
@@ -66,16 +70,14 @@ function updatePredictButtonState() {
 async function predict() {
     if (!isModelLoaded || !isImageUploaded) return;
 
-    // Show loading state on button
     buttonText.style.display = 'none';
     buttonLoader.style.display = 'block';
     predictButton.disabled = true;
 
     try {
         const prediction = await model.predict(imagePreview);
-        labelContainer.innerHTML = ""; // Clear previous results
+        labelContainer.innerHTML = ""; 
         
-        // Sort predictions by probability
         prediction.sort((a, b) => b.probability - a.probability);
 
         for (let i = 0; i < prediction.length; i++) {
@@ -96,10 +98,8 @@ async function predict() {
         console.error("Prediction error:", error);
         labelContainer.innerHTML = "<p style='color: red;'>Prediction failed.</p>";
     } finally {
-        // Restore button state
         buttonText.style.display = 'inline';
         buttonLoader.style.display = 'none';
-        // Re-enable button if needed for another prediction with the same image
-        updatePredictButtonState(); 
+        updatePredictButtonState();
     }
 }
