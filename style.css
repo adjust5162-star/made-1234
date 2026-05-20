@@ -1,6 +1,6 @@
 
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Poppins', sans-serif;
     background-color: #f0f2f5;
     color: #333;
     display: flex;
@@ -8,13 +8,15 @@ body {
     align-items: center;
     margin: 0;
     padding: 20px;
-    height: 100vh;
+    min-height: 100vh;
     box-sizing: border-box;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Cpath d='M36 0c-9.94 0-18 8.06-18 18s8.06 18 18 18 18-8.06 18-18S45.94 0 36 0zm0 34c-8.84 0-16-7.16-16-16S27.16 2 36 2s16 7.16 16 16-7.16 16-16 16zM2 34C2 24.06 10.06 16 20 16s18 8.06 18 18-8.06 18-18 18S2 43.94 2 34zm18-16C13.16 18 4 27.16 4 34s9.16 16 16 16 16-7.16 16-16-7.16-16-16-16z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
 h1 {
     color: #4a4a4a;
     margin-bottom: 10px;
+    font-weight: 600;
 }
 
 p {
@@ -23,33 +25,37 @@ p {
 }
 
 button {
-    background-color: #007bff;
+    background: linear-gradient(145deg, #007bff, #0056b3);
     color: white;
     border: none;
     padding: 12px 24px;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 16px;
-    transition: background-color 0.3s ease;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
     margin-bottom: 20px;
 }
 
 button:hover {
-    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
 }
 
 #webcam-container {
     border: 2px solid #ccc;
-    border-radius: 8px;
+    border-radius: 12px;
     overflow: hidden;
     margin-bottom: 20px;
     width: 200px;
     height: 200px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 #label-container {
     font-size: 18px;
-    font-weight: bold;
+    font-weight: 600;
     color: #333;
     display: flex;
     flex-direction: column;
