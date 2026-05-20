@@ -1,105 +1,69 @@
-const URL = "https://teachablemachine.withgoogle.com/models/b-S-p_4z9/";
+const MODEL_URL = "https://teachablemachine.withgoogle.com/models/b-S-p_4z9/";
 
-let model;
-let isModelLoaded = false;
-let isImageUploaded = false;
+document.addEventListener("DOMContentLoaded", () => {
+    const imageUpload = document.getElementById("imageUpload");
+    const imagePreview = document.getElementById("imagePreview");
+    const predictButton = document.getElementById("predictButton");
+    const labelContainer = document.getElementById("label-container");
 
-// UI Elements
-let loader, appContainer, imageUpload, imagePreview, imagePlaceholder, labelContainer, predictButton, buttonText, buttonLoader;
+    let model;
+    let isImageReady = false;
 
-document.addEventListener('DOMContentLoaded', (event) => {
-    // Initialize UI Elements
-    loader = document.getElementById('loader');
-    appContainer = document.getElementById('app-container');
-    imageUpload = document.getElementById('imageUpload');
-    imagePreview = document.getElementById('image-preview');
-    imagePlaceholder = document.getElementById('image-placeholder');
-    labelContainer = document.getElementById('label-container');
-    predictButton = document.getElementById('predict-button');
-    buttonText = predictButton.querySelector('.button-text');
-    buttonLoader = predictButton.querySelector('.button-loader');
-
-    // Add event listeners
-    imageUpload.addEventListener('change', handleImage);
-    predictButton.addEventListener('click', predict);
-
-    init();
-});
-
-async function init() {
-    const modelURL = URL + "model.json";
-    const metadataURL = URL + "metadata.json";
-
-    try {
-        model = await tmImage.load(modelURL, metadataURL);
-        isModelLoaded = true;
-        
-        loader.style.display = 'none';
-        appContainer.style.display = 'block';
-        
-        updatePredictButtonState();
-    } catch (error) {
-        console.error("Error loading the model:", error);
-        loader.innerHTML = "Failed to load model. Please refresh.";
-    }
-}
-
-function handleImage(event) {
-    const image = event.target.files[0];
-    if (image) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            imagePreview.src = e.target.result;
-            imagePreview.style.display = 'block';
-            imagePlaceholder.style.display = 'none';
-            isImageUploaded = true;
-            updatePredictButtonState();
+    async function loadModel() {
+        const modelURL = MODEL_URL + "model.json";
+        const metadataURL = MODEL_URL + "metadata.json";
+        try {
+            model = await tmImage.load(modelURL, metadataURL);
+            console.log("Model loaded");
+            checkReady();
+        } catch (error) {
+            console.error("Error loading model:", error);
+            labelContainer.innerHTML = "Failed to load model.";
         }
-        reader.readAsDataURL(image);
     }
-}
 
-function updatePredictButtonState() {
-    if (isModelLoaded && isImageUploaded) {
-        predictButton.disabled = false;
-    } else {
+    imageUpload.addEventListener("change", (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = "block";
+                isImageReady = true;
+                checkReady();
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    function checkReady() {
+        if (model && isImageReady) {
+            predictButton.disabled = false;
+        }
+    }
+
+    predictButton.addEventListener("click", async () => {
+        if (!model || !isImageReady) return;
+
         predictButton.disabled = true;
-    }
-}
-
-async function predict() {
-    if (!isModelLoaded || !isImageUploaded) return;
-
-    buttonText.style.display = 'none';
-    buttonLoader.style.display = 'block';
-    predictButton.disabled = true;
-
-    try {
-        const prediction = await model.predict(imagePreview);
-        labelContainer.innerHTML = ""; 
+        predictButton.textContent = "Predicting...";
         
-        prediction.sort((a, b) => b.probability - a.probability);
-
-        for (let i = 0; i < prediction.length; i++) {
-            const resultItem = document.createElement("div");
-            resultItem.classList.add('result-item');
-
-            const className = document.createElement("span");
-            className.textContent = prediction[i].className;
-
-            const probability = document.createElement("span");
-            probability.textContent = (prediction[i].probability * 100).toFixed(2) + '%';
-
-            resultItem.appendChild(className);
-            resultItem.appendChild(probability);
-            labelContainer.appendChild(resultItem);
+        try {
+            const prediction = await model.predict(imagePreview);
+            labelContainer.innerHTML = ""; 
+            prediction.forEach(pred => {
+                const el = document.createElement("div");
+                el.innerHTML = `${pred.className}: ${(pred.probability * 100).toFixed(2)}%`;
+                labelContainer.appendChild(el);
+            });
+        } catch (error) {
+            console.error("Prediction error:", error);
+            labelContainer.innerHTML = "Prediction failed.";
+        } finally {
+            predictButton.disabled = false;
+            predictButton.textContent = "Predict";
         }
-    } catch (error) {
-        console.error("Prediction error:", error);
-        labelContainer.innerHTML = "<p style='color: red;'>Prediction failed.</p>";
-    } finally {
-        buttonText.style.display = 'inline';
-        buttonLoader.style.display = 'none';
-        updatePredictButtonState();
-    }
-}
+    });
+
+    loadModel();
+});

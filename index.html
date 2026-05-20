@@ -6,44 +6,28 @@
     <title>Animal Face Test</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="loader">
-        <div class="spinner"></div>
-        <p>Loading Model...</p>
-    </div>
+    <main class="card">
+        <div class="card-header">
+            <h1>Animal Face Test</h1>
+            <p>Is it a dog or a cat?</p>
+        </div>
 
-    <div id="app-container" style="display: none;">
-        <div class="card">
-            <div class="card-header">
-                <h1>Animal Face Test</h1>
-                <p>Is it a dog or a cat? Upload a picture to find out!</p>
-            </div>
-            <div class="card-body">
-                <div id="image-container">
-                    <img id="image-preview" src="" alt="Image preview"/>
-                    <div id="image-placeholder">
-                        <i class="fas fa-image"></i>
-                        <p>Your image will appear here</p>
-                    </div>
-                </div>
-                <div class="upload-container">
-                    <input type="file" id="imageUpload" accept="image/*">
-                    <label for="imageUpload" class="upload-label">
-                        <i class="fas fa-upload"></i> Choose Image
-                    </label>
-                </div>
-                <button id="predict-button" type="button" disabled>
-                    <span class="button-text">Predict</span>
-                    <span class="button-loader" style="display: none;"></span>
-                </button>
-            </div>
+        <div class="card-body">
+            <label for="imageUpload" class="upload-label">Choose an Image</label>
+            <input type="file" id="imageUpload" accept="image/*" hidden>
+            
+            <img id="imagePreview" src="#" alt="Image preview" style="display:none; max-width: 100%; margin-top: 20px; border-radius: 8px;"/>
+        </div>
+
+        <div class="card-footer">
+            <button id="predictButton" disabled>Predict</button>
             <div id="label-container"></div>
         </div>
-    </div>
+    </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
