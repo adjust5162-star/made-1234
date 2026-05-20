@@ -1,27 +1,43 @@
 const MODEL_URL = "https://teachablemachine.withgoogle.com/models/b-S-p_4z9/";
 
 document.addEventListener("DOMContentLoaded", () => {
+    // DOM Elements
     const imageUpload = document.getElementById("imageUpload");
     const imagePreview = document.getElementById("imagePreview");
     const predictButton = document.getElementById("predictButton");
     const labelContainer = document.getElementById("label-container");
 
+    // Application State
     let model;
-    let isImageReady = false;
+    let isModelLoaded = false;
+    let isImageUploaded = false;
 
+    // Function to update the predict button's state
+    function updatePredictButtonState() {
+        if (isModelLoaded && isImageUploaded) {
+            predictButton.disabled = false;
+        } else {
+            predictButton.disabled = true;
+        }
+    }
+
+    // Load the model
     async function loadModel() {
+        labelContainer.innerHTML = "Loading Model...";
         const modelURL = MODEL_URL + "model.json";
         const metadataURL = MODEL_URL + "metadata.json";
         try {
             model = await tmImage.load(modelURL, metadataURL);
-            console.log("Model loaded");
-            checkReady();
+            isModelLoaded = true;
+            labelContainer.innerHTML = "Model loaded. Please upload an image.";
+            updatePredictButtonState();
         } catch (error) {
             console.error("Error loading model:", error);
-            labelContainer.innerHTML = "Failed to load model.";
+            labelContainer.innerHTML = "Error loading model. Please refresh.";
         }
     }
 
+    // Handle image upload
     imageUpload.addEventListener("change", (event) => {
         const file = event.target.files[0];
         if (file) {
@@ -29,28 +45,25 @@ document.addEventListener("DOMContentLoaded", () => {
             reader.onload = (e) => {
                 imagePreview.src = e.target.result;
                 imagePreview.style.display = "block";
-                isImageReady = true;
-                checkReady();
+                isImageUploaded = true;
+                updatePredictButtonState();
             };
             reader.readAsDataURL(file);
         }
     });
 
-    function checkReady() {
-        if (model && isImageReady) {
-            predictButton.disabled = false;
-        }
-    }
-
+    // Handle prediction
     predictButton.addEventListener("click", async () => {
-        if (!model || !isImageReady) return;
+        if (!isModelLoaded || !isImageUploaded) {
+            return;
+        }
 
         predictButton.disabled = true;
         predictButton.textContent = "Predicting...";
-        
+
         try {
             const prediction = await model.predict(imagePreview);
-            labelContainer.innerHTML = ""; 
+            labelContainer.innerHTML = ""; // Clear previous results
             prediction.forEach(pred => {
                 const el = document.createElement("div");
                 el.innerHTML = `${pred.className}: ${(pred.probability * 100).toFixed(2)}%`;
@@ -58,12 +71,14 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         } catch (error) {
             console.error("Prediction error:", error);
-            labelContainer.innerHTML = "Prediction failed.";
+            labelContainer.innerHTML = "Prediction failed. Please try again.";
         } finally {
             predictButton.disabled = false;
             predictButton.textContent = "Predict";
         }
     });
 
+    // Initial setup
+    updatePredictButtonState();
     loadModel();
 });

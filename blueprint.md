@@ -10,7 +10,7 @@ This project is a web application that uses a pre-trained Teachable Machine mode
     *   **Image Upload Button:** A clear, accessible button for selecting an image file.
     *   **Image Preview:** Displays the user's uploaded image.
     *   **Predict Button:** A button that is enabled only when both the model is loaded and an image is selected, providing clear feedback during prediction.
-    *   **Results Area:** A dedicated section to display the prediction outcomes.
+    *   **Results Area:** A dedicated section to display the prediction outcomes and application status (e.g., "Loading Model...").
 *   **Design:**
     *   **Layout:** A simple, centered card layout that is intuitive and easy to use.
     *   **Fonts:** 'Poppins' for a clean, modern look.
@@ -18,7 +18,7 @@ This project is a web application that uses a pre-trained Teachable Machine mode
     *   **Feedback:** The UI provides clear states for button enablement, and loading text during prediction.
 *   **Features:**
     *   **Reliable Core Logic:** The JavaScript has been rewritten to be more robust, ensuring that event listeners and state management work correctly.
-    *   **State-Driven UI:** The 'Predict' button is strictly controlled by the application's state (model loaded, image uploaded).
+    *   **State-Driven UI:** The 'Predict' button is strictly controlled by the application’s state (model loaded, image uploaded).
     *   **Clear User Flow:** The user is guided through a simple process: upload image, then predict.
 
 ## 3. Implementation Plan
@@ -26,18 +26,15 @@ This project is a web application that uses a pre-trained Teachable Machine mode
 *   **HTML (`index.html`):**
     *   A simplified, semantic structure focusing on the essential elements: an upload button, an image preview, a predict button, and a container for results.
 *   **JavaScript (`main.js`):**
-    *   **Ground-Up Rewrite:** The entire script was rewritten to eliminate previous errors.
-    *   **Event Listeners:** All event listeners are now correctly bound within the `DOMContentLoaded` event.
-    *   **State Management:** `isImageReady` and `model` variables track the application's state to control the UI.
+    *   **State Management:** `isModelLoaded` and `isImageUploaded` state variables track the application's readiness.
+    *   **State Update Function:** A dedicated `updatePredictButtonState()` function centralizes the logic for enabling/disabling the predict button, ensuring reliability.
     *   **Asynchronous Handling:** `async/await` is used for clean handling of model loading and prediction.
+    *   **User Feedback:** The label container is used to provide status updates to the user (e.g., model loading, prediction results).
 *   **CSS (`style.css`):**
-    *   A clean and modern stylesheet was created to complement the new, simplified structure.
-    *   Styles provide clear visual cues for interactive elements, including hover effects and disabled states.
+    *   A clean and modern stylesheet complements the structure, with clear visual cues for interactive elements.
 
-## 4. Current Task: Complete Rebuild to Fix All Errors
+## 4. Current Task: Fix Predict Button Activation
 
-*   **Objective:** Resolve all outstanding errors and create a stable, functional application by rebuilding the core components from scratch.
+*   **Objective:** Fix the bug where the 'Predict' button was not being enabled after both the model was loaded and an image was uploaded.
 *   **Changes:**
-    *   **`index.html`:** Re-structured for clarity and simplicity.
-    *   **`main.js`:** Completely rewritten to ensure correct, error-free functionality.
-    *   **`style.css`:** Re-styled to match the new structure with a focus on usability and a clean aesthetic.
+    *   **`main.js`:** Introduced a more robust state management system with `isModelLoaded` and `isImageUploaded` flags. Created a central function, `updatePredictButtonState()`, which is called every time the state changes (after model loading and after image upload). This ensures the button's state is always in sync with the application's state.
