@@ -1,42 +1,43 @@
-const URL = 'https://teachablemachine.withgoogle.com/models/CXXM1PfkL/';
+const URL = "https://teachablemachine.withgoogle.com/models/b-S-p_4z9/";
 
-let model, webcam, labelContainer, maxPredictions;
+let model, imagePreview, labelContainer, predictButton;
 
 async function init() {
-    const modelURL = URL + 'model.json';
-    const metadataURL = URL + 'metadata.json';
+    const modelURL = URL + "model.json";
+    const metadataURL = URL + "metadata.json";
 
     model = await tmImage.load(modelURL, metadataURL);
-    maxPredictions = model.getTotalClasses();
-
-    const flip = true;
-    webcam = new tmImage.Webcam(200, 200, flip);
-    await webcam.setup();
-    await webcam.play();
-    window.requestAnimationFrame(loop);
-
-    document.getElementById('webcam-container').appendChild(webcam.canvas);
-    labelContainer = document.getElementById('label-container');
-    for (let i = 0; i < maxPredictions; i++) {
-        labelContainer.appendChild(document.createElement('div'));
-    }
 }
 
-async function loop() {
-    webcam.update();
-    await predict();
-    window.requestAnimationFrame(loop);
+function handleImage(event) {
+    const image = event.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        imagePreview.src = e.target.result;
+        imagePreview.style.display = 'block';
+        predictButton.disabled = false;
+    }
+
+    reader.readAsDataURL(image);
 }
 
 async function predict() {
-    const prediction = await model.predict(webcam.canvas);
-    for (let i = 0; i < maxPredictions; i++) {
-        const classPrediction =
-            prediction[i].className + ': ' + prediction[i].probability.toFixed(2);
-        labelContainer.childNodes[i].innerHTML = classPrediction;
+    const prediction = await model.predict(imagePreview);
+    labelContainer.innerHTML = ""; // Clear previous results
+    for (let i = 0; i < prediction.length; i++) {
+        const classPrediction = 
+            prediction[i].className + ": " + prediction[i].probability.toFixed(2);
+        const elem = document.createElement("div");
+        elem.innerHTML = classPrediction;
+        labelContainer.appendChild(elem);
     }
 }
 
-window.onload = () => {
-    // The init function is now globally available and will be called by the button's onclick event.
-};
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    imagePreview = document.getElementById('image-preview');
+    labelContainer = document.getElementById('label-container');
+    predictButton = document.getElementById('predict-button');
+    init();
+});
