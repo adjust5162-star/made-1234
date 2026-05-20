@@ -12,8 +12,8 @@ This project is a web application that uses a pre-trained Teachable Machine mode
     *   **Label Container:** To display the prediction results (dog or cat) with probabilities.
 *   **Design:**
     *   **Layout:** A simple, centered layout for easy viewing.
-    *   **Fonts:** Clean and readable fonts.
-    *   **Colors:** A simple and friendly color palette.
+    *   **Fonts:** Clean and readable fonts ('Arial', sans-serif).
+    *   **Colors:** A simple and friendly color palette with a light background (`#f0f2f5`) and blue accents (`#007bff`).
 *   **Features:**
     *   **Real-time Prediction:** The application will continuously predict the user's face from the webcam feed.
     *   **Model Integration:** The application will use a Teachable Machine model loaded from a URL.
@@ -39,3 +39,10 @@ This project is a web application that uses a pre-trained Teachable Machine mode
         *   Update the label container with the prediction results.
 *   **CSS (`style.css`):**
     *   Add styles for the layout, webcam container, and label container to ensure a clean and user-friendly interface.
+
+## 4. Current Task: Error Fixes and Styling
+
+*   **Objective:** Fix potential runtime errors and improve the visual design of the application.
+*   **Changes:**
+    *   **`style.css`:** Replaced placeholder styles with a more polished and relevant design for the Animal Face Test application.
+    *   **`main.js`:** Ensured the `init()` function is correctly triggered by the `Start` button by making it globally accessible, resolving a potential scope issue.
