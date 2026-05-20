@@ -1,43 +1,105 @@
 const URL = "https://teachablemachine.withgoogle.com/models/b-S-p_4z9/";
 
-let model, imagePreview, labelContainer, predictButton;
+let model;
+let isModelLoaded = false;
+let isImageUploaded = false;
+
+// UI Elements
+let loader, appContainer, imagePreview, imagePlaceholder, labelContainer, predictButton, buttonText, buttonLoader;
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    // Initialize UI Elements
+    loader = document.getElementById('loader');
+    appContainer = document.getElementById('app-container');
+    imagePreview = document.getElementById('image-preview');
+    imagePlaceholder = document.getElementById('image-placeholder');
+    labelContainer = document.getElementById('label-container');
+    predictButton = document.getElementById('predict-button');
+    buttonText = predictButton.querySelector('.button-text');
+    buttonLoader = predictButton.querySelector('.button-loader');
+
+    init();
+});
 
 async function init() {
     const modelURL = URL + "model.json";
     const metadataURL = URL + "metadata.json";
 
-    model = await tmImage.load(modelURL, metadataURL);
+    try {
+        model = await tmImage.load(modelURL, metadataURL);
+        isModelLoaded = true;
+        
+        // Hide loader and show the main app
+        loader.style.display = 'none';
+        appContainer.style.display = 'block';
+        
+        updatePredictButtonState();
+    } catch (error) {
+        console.error("Error loading the model:", error);
+        loader.innerHTML = "Failed to load model. Please refresh.";
+    }
 }
 
 function handleImage(event) {
     const image = event.target.files[0];
-    const reader = new FileReader();
-
-    reader.onload = function(e) {
-        imagePreview.src = e.target.result;
-        imagePreview.style.display = 'block';
-        predictButton.disabled = false;
+    if (image) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            imagePreview.src = e.target.result;
+            imagePreview.style.display = 'block';
+            imagePlaceholder.style.display = 'none'; // Hide placeholder
+            isImageUploaded = true;
+            updatePredictButtonState();
+        }
+        reader.readAsDataURL(image);
     }
+}
 
-    reader.readAsDataURL(image);
+function updatePredictButtonState() {
+    if (isModelLoaded && isImageUploaded) {
+        predictButton.disabled = false;
+    } else {
+        predictButton.disabled = true;
+    }
 }
 
 async function predict() {
-    const prediction = await model.predict(imagePreview);
-    labelContainer.innerHTML = ""; // Clear previous results
-    for (let i = 0; i < prediction.length; i++) {
-        const classPrediction = 
-            prediction[i].className + ": " + prediction[i].probability.toFixed(2);
-        const elem = document.createElement("div");
-        elem.innerHTML = classPrediction;
-        labelContainer.appendChild(elem);
+    if (!isModelLoaded || !isImageUploaded) return;
+
+    // Show loading state on button
+    buttonText.style.display = 'none';
+    buttonLoader.style.display = 'block';
+    predictButton.disabled = true;
+
+    try {
+        const prediction = await model.predict(imagePreview);
+        labelContainer.innerHTML = ""; // Clear previous results
+        
+        // Sort predictions by probability
+        prediction.sort((a, b) => b.probability - a.probability);
+
+        for (let i = 0; i < prediction.length; i++) {
+            const resultItem = document.createElement("div");
+            resultItem.classList.add('result-item');
+
+            const className = document.createElement("span");
+            className.textContent = prediction[i].className;
+
+            const probability = document.createElement("span");
+            probability.textContent = (prediction[i].probability * 100).toFixed(2) + '%';
+
+            resultItem.appendChild(className);
+            resultItem.appendChild(probability);
+            labelContainer.appendChild(resultItem);
+        }
+    } catch (error) {
+        console.error("Prediction error:", error);
+        labelContainer.innerHTML = "<p style='color: red;'>Prediction failed.</p>";
+    } finally {
+        // Restore button state
+        buttonText.style.display = 'inline';
+        buttonLoader.style.display = 'none';
+        // Re-enable button if needed for another prediction with the same image
+        updatePredictButtonState(); 
     }
 }
-
-
-document.addEventListener('DOMContentLoaded', (event) => {
-    imagePreview = document.getElementById('image-preview');
-    labelContainer = document.getElementById('label-container');
-    predictButton = document.getElementById('predict-button');
-    init();
-});
